@@ -9,12 +9,13 @@ class User < ActiveRecord::Base
     # on the user#edit form.
 
     name          :string, :required, :unique
+    abbrev :string, :unique
     email_address :email_address, :login => true
     administrator :boolean, :default => false
     timestamps
   end
-  attr_accessible :name, :email_address, :password, :password_confirmation, :current_password
-
+  attr_accessible :name, :email_address, :password, :password_confirmation, :current_password, :abbrev
+  
   has_many :projects, :class_name => "Project", :foreign_key => "owner_id", :inverse_of => :owner
   has_many :project_memberships, :dependent => :destroy, :inverse_of => :user
   has_many :joined_projects, :through => :project_memberships, :source => :project
@@ -38,7 +39,7 @@ class User < ActiveRecord::Base
     state :active
 
     create :signup, :available_to => "Guest",
-      :params => [:name, :email_address, :password, :password_confirmation],
+      :params => [:name, :email_address, :abbrev, :password, :password_confirmation],
       :become => :inactive, :new_key => true  do
       UserMailer.activation(self, lifecycle.key).deliver_now
     end
@@ -71,8 +72,8 @@ class User < ActiveRecord::Base
 
   def update_permitted?
     acting_user.administrator? ||
-      (acting_user == self && only_changed?(:email_address, :crypted_password,
-                                            :current_password, :password, :password_confirmation))
+      (acting_user == self && only_changed?(:name, :email_address, :crypted_password,
+                                            :current_password, :password, :password_confirmation, :abbrev))
     # Note: crypted_password has attr_protected so although it is permitted to change, it cannot be changed
     # directly from a form submission.
   end

@@ -27,9 +27,14 @@ class ProjectMembership < ActiveRecord::Base
 
   validates_presence_of my_mandatory_attributes
 
-  def name
-    project.name
-  end
+def name
+  ret = ""
+  ret += user.abbrev
+  ret += " as "
+  ret += role.abbrev
+  ret += " in "
+  ret += project.abbrev
+end
 
   # --- Permissions --- #
 

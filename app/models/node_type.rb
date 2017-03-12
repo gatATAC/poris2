@@ -1,18 +1,18 @@
-class Role < ActiveRecord::Base
+class NodeType < ActiveRecord::Base
 
   hobo_model # Don't put anything above this
 
   fields do
-    name :string, :unique
-    abbrev :string, :unique
-    description :text
+    name     :string
+    totype   :string
+    img_link :string
     timestamps
   end
-  attr_accessible :name, :abbrev, :description
+  attr_accessible :name, :totype, :img_link
 
   # TODO: See if it is possible to ask for the fields
   def self.my_mandatory_attributes
-    [:name, :abbrev, :description]
+    [:name, :totype, :img_link]
   end
 
   def self.my_attributes
@@ -21,8 +21,8 @@ class Role < ActiveRecord::Base
   end
 
   validates_presence_of my_mandatory_attributes
-  
-  has_many :project_memberships
+
+  has_many :nodes, :inverse_of => :node_type
 
   # --- Permissions --- #
 

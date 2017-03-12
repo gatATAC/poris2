@@ -11,7 +11,36 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170312065549) do
+ActiveRecord::Schema.define(version: 20170312073617) do
+
+  create_table "node_types", force: :cascade do |t|
+    t.string   "name"
+    t.string   "totype"
+    t.string   "img_link"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "nodes", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "type"
+    t.float    "rangemin"
+    t.float    "rangemax"
+    t.float    "default_float"
+    t.string   "default_string"
+    t.datetime "date_min"
+    t.datetime "date_max"
+    t.datetime "default_date"
+    t.string   "file_extension"
+    t.string   "file_description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "project_id"
+    t.integer  "node_type_id"
+  end
+
+  add_index "nodes", ["node_type_id"], name: "index_nodes_on_node_type_id"
+  add_index "nodes", ["project_id"], name: "index_nodes_on_project_id"
 
   create_table "project_memberships", force: :cascade do |t|
     t.boolean  "contributor",   default: false
@@ -61,6 +90,7 @@ ActiveRecord::Schema.define(version: 20170312065549) do
     t.datetime "updated_at"
     t.string   "state",                                default: "inactive"
     t.datetime "key_timestamp"
+    t.string   "abbrev"
   end
 
   add_index "users", ["state"], name: "index_users_on_state"
