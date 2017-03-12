@@ -15,6 +15,10 @@ class User < ActiveRecord::Base
   end
   attr_accessible :name, :email_address, :password, :password_confirmation, :current_password
 
+  has_many :projects, :class_name => "Project", :foreign_key => "owner_id", :inverse_of => :owner
+  has_many :project_memberships, :dependent => :destroy, :inverse_of => :user
+  has_many :joined_projects, :through => :project_memberships, :source => :project
+
   # This gives admin rights and an :active state to the first sign-up.
   # Just remove it if you don't want that
   before_create do |user|
@@ -24,6 +28,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  children :projects
 
   # --- Signup lifecycle --- #
 

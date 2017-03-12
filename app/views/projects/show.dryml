@@ -1,0 +1,17 @@
+<show-page>
+  <collection-section: replace>
+    <p>
+    <h3>Members</h3>
+    <table-plus: with="&@project_memberships" fields="this, user, role, contributor">
+    <header:></header:>
+    <controls:/>
+    <empty-message:>No members in this project</empty-message:>
+    </table-plus:>
+    <a:project_memberships action="new" if="&can_create?(@project.project_memberships)">New Membership</a>
+    <br/>
+    <br/>
+    <br/>
+    </p>
+
+  </collection-section:>
+</show-page>

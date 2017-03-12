@@ -6,9 +6,9 @@
     <header class="content-header hero-unit">
       <h1>Welcome to <app-name/></h1>
       <section class="welcome-message">
-        <h3>Congratulations! Your Hobo Rails App is up and running</h3>
+        <h3>Welcome to PORIS toolkit's Sketch web editor</h3>
         <ul>
-          <li>To customise this page: edit app/views/front/index.dryml</li>
+          <li>Feel free to use this web editor to execute your tutorials or to build your own custom PORIS sketches.  If you need to set up a custom web application server, please contact us throught www.elporis.com.</li>
         </ul>
 
         <% if User.count == 0 -%>
@@ -23,8 +23,15 @@
       </section>
     </header>
 
-    <section class="content-body">
-    </section>
+<section with="&current_user" class="content-body" if="&logged_in?">
+  <h3>Your Projects</h3>
+  <collection:projects><card without-creator-link/></collection>
+
+  <a:projects action="new">New Project</a>
+
+  <h3>Projects you have joined</h3>
+  <collection:joined-projects><card without-creator-link/></collection>
+</section>
   </content:>
 
 </page>
