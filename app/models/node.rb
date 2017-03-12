@@ -22,6 +22,18 @@ class Node < ActiveRecord::Base
   belongs_to :project, :creator => true, :inverse_of => :nodes
   belongs_to :node_type, :inverse_of => :nodes
 
+  belongs_to :parent, :foreign_key => :parent_id, :class_name => 'Node'
+  has_many :children, :foreign_key => :parent_id, :class_name => 'Node'
+  belongs_to :root, :class_name => 'Node'
+
+  has_many :edges_as_source, :class_name => 'NodesEdge', :foreign_key => 'source_id', :dependent => :destroy, #, :order => :position
+    :inverse_of => :destination
+  has_many :edges_as_destination, :class_name => 'NodesEdge', :foreign_key => 'destination_id', :inverse_of => :source
+  has_many :sources, :through => :edges_as_destination , :accessible => true
+  has_many :destinations, :through => :edges_as_source, # :order => 'nodes_edges.position'
+    :accessible => true
+
+
   def self.my_mandatory_attributes
     [:name,:project_id,:node_type_id,:type]
   end

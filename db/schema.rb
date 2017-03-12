@@ -11,7 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170312073617) do
+ActiveRecord::Schema.define(version: 20170312080305) do
+
+  create_table "libraries", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "node_types", force: :cascade do |t|
     t.string   "name"
@@ -37,10 +43,24 @@ ActiveRecord::Schema.define(version: 20170312073617) do
     t.datetime "updated_at"
     t.integer  "project_id"
     t.integer  "node_type_id"
+    t.integer  "parent_id"
+    t.integer  "root_id"
   end
 
   add_index "nodes", ["node_type_id"], name: "index_nodes_on_node_type_id"
+  add_index "nodes", ["parent_id"], name: "index_nodes_on_parent_id"
   add_index "nodes", ["project_id"], name: "index_nodes_on_project_id"
+  add_index "nodes", ["root_id"], name: "index_nodes_on_root_id"
+
+  create_table "nodes_edges", force: :cascade do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "source_id"
+    t.integer  "destination_id"
+  end
+
+  add_index "nodes_edges", ["destination_id"], name: "index_nodes_edges_on_destination_id"
+  add_index "nodes_edges", ["source_id"], name: "index_nodes_edges_on_source_id"
 
   create_table "project_memberships", force: :cascade do |t|
     t.boolean  "contributor",   default: false
