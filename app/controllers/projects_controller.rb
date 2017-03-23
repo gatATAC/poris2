@@ -7,12 +7,10 @@ class ProjectsController < ApplicationController
 
   def show
     @project = find_instance
-    @project_memberships = @project.project_memberships
-    respond_to do |format|
-    	format.html {
-    		hobo_show
-    	}
-    end
+    @nodes =
+      @project.nodes
+    @project_memberships =
+      @project.project_memberships
   end
 
 end

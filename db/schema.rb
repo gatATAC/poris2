@@ -11,13 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170312080305) do
-
-  create_table "libraries", force: :cascade do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(version: 20170314192015) do
 
   create_table "node_types", force: :cascade do |t|
     t.string   "name"
@@ -29,34 +23,22 @@ ActiveRecord::Schema.define(version: 20170312080305) do
 
   create_table "nodes", force: :cascade do |t|
     t.string   "name"
-    t.integer  "type"
-    t.float    "rangemin"
-    t.float    "rangemax"
-    t.float    "default_float"
-    t.string   "default_string"
-    t.datetime "date_min"
-    t.datetime "date_max"
-    t.datetime "default_date"
-    t.string   "file_extension"
-    t.string   "file_description"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "project_id"
     t.integer  "node_type_id"
-    t.integer  "parent_id"
-    t.integer  "root_id"
   end
 
   add_index "nodes", ["node_type_id"], name: "index_nodes_on_node_type_id"
-  add_index "nodes", ["parent_id"], name: "index_nodes_on_parent_id"
   add_index "nodes", ["project_id"], name: "index_nodes_on_project_id"
-  add_index "nodes", ["root_id"], name: "index_nodes_on_root_id"
 
   create_table "nodes_edges", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "source_id"
     t.integer  "destination_id"
+    t.integer  "position"
+    t.string   "name"
   end
 
   add_index "nodes_edges", ["destination_id"], name: "index_nodes_edges_on_destination_id"

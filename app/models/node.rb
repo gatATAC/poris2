@@ -4,63 +4,74 @@ class Node < ActiveRecord::Base
 
   fields do
     name :string
-    type         :integer
-    rangemin :float
-    rangemax :float
-    default_float :float
-    default_string :string
-    date_min :datetime
-    date_max :datetime
-    default_date :datetime
-    file_extension :string
-    file_description :string
 
     timestamps
   end
-  attr_accessible :name, :node_type, :node_type_id
+
+  attr_accessible :name, :node_type, :node_type_id, :project, :project_id, :edges_as_source, :destinations, :edges_as_destination, :sources
 
   belongs_to :project, :creator => true, :inverse_of => :nodes
   belongs_to :node_type, :inverse_of => :nodes
 
-  belongs_to :parent, :foreign_key => :parent_id, :class_name => 'Node'
-  has_many :children, :foreign_key => :parent_id, :class_name => 'Node'
-  belongs_to :root, :class_name => 'Node'
-
-  has_many :edges_as_source, :class_name => 'NodesEdge', :foreign_key => 'source_id', :dependent => :destroy, #, :order => :position
-    :inverse_of => :destination
-  has_many :edges_as_destination, :class_name => 'NodesEdge', :foreign_key => 'destination_id', :inverse_of => :source
-  has_many :sources, :through => :edges_as_destination , :accessible => true
-  has_many :destinations, :through => :edges_as_source, # :order => 'nodes_edges.position'
-    :accessible => true
-
+  has_many :edges_as_source, :class_name => 'NodesEdge', :foreign_key => 'source_id', :dependent => :destroy, :inverse_of => :source
+  has_many :destinations, :through => :edges_as_source, :class_name => 'Node', :accessible => :true
+  has_many :edges_as_destination, :class_name => 'NodesEdge', :foreign_key => 'destination_id', :inverse_of => :destination, :dependent => :destroy
+  has_many :sources, :through => :edges_as_destination, :class_name => 'Node', :accessible => :true
 
   def self.my_mandatory_attributes
-    [:name,:project_id,:node_type_id,:type]
+    [:name,:project_id,:node_type_id]
   end
 
   def self.my_attributes
     ret=my_mandatory_attributes
     return ret
   end
-
+ 
   validates_presence_of my_mandatory_attributes
+  validate :destinations_valid?
 
+  children :destinations, :sources
+
+  def possible_destinations
+    ret = []
+    ret += self.project.nodes - [self] - self.sources
+  end
+
+  def possible_sources
+    ret = []
+    ret += self.project.nodes - [self] - self.destinations
+  end
+
+  def destinations_valid?
+    if ((possible_destinations & destinations) == destinations) then
+      aux = destinations & sources
+      if (not(aux.empty?)) then
+        errors.add(:destinations, "can't contain a node already present in sources")
+      end
+    else
+        errors.add(:destinations, "can't contain a node not suitable for present node. f.i. not of the same project.")
+    end
+  end
   # --- Permissions --- #
 
   def create_permitted?
-    acting_user.signed_up? && project.accepts_changes_from?(acting_user)
+    #acting_user.signed_up? && ((project == nil) || project.accepts_changes_from?(acting_user))
+    true
   end
 
   def update_permitted?
-    acting_user.signed_up? && project.accepts_changes_from?(acting_user)
+    #acting_user.signed_up? && project.accepts_changes_from?(acting_user) && !node_type_changed?
+    true
   end
 
   def destroy_permitted?
-    acting_user.signed_up? && project.accepts_changes_from?(acting_user)
+    #acting_user.signed_up? && project.accepts_changes_from?(acting_user)
+    true
   end
 
   def view_permitted?(attribute)
-    acting_user.signed_up? && project.viewable_by?(acting_user)
+    #acting_user.signed_up? && ((project == nil) || project.viewable_by?(acting_user))
+    true
   end
 
 end

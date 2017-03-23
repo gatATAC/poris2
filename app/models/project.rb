@@ -31,21 +31,21 @@ class Project < ActiveRecord::Base
   has_many :members, :through => :project_memberships, :source => :user
   has_many :contributor_memberships, :class_name => "ProjectMembership", :scope => :contributor
   has_many :contributors, :through => :contributor_memberships, :source => :user
-
-  has_many :nodes, :inverse_of => :node_type
   
-  children :project_memberships, :nodes
+  has_many :nodes, :dependent => :destroy, :inverse_of => :node_type
+
+  children :nodes, :project_memberships
 
 
   # --- Permissions --- #
 
     # permission helper
   def accepts_changes_from?(user)
-    user.administrator? || user == owner || user.in?(contributors)
+    user.administrator? || (owner_is? user) || user.in?(contributors)
   end
 
   def create_permitted?
-    acting_user.administrator? || ((owner_is? acting_user))
+    acting_user.administrator? || (owner_is? acting_user)
   end
 
   def update_permitted?
@@ -57,7 +57,7 @@ class Project < ActiveRecord::Base
   end
 
   def view_permitted?(field)
-    (acting_user.administrator? || acting_user == owner || acting_user.in?(members) || self.public)
+    (acting_user.administrator? || ((owner_is? acting_user))|| acting_user.in?(members) || self.public)
   end
 
 end

@@ -2,12 +2,18 @@ class NodesController < ApplicationController
 
   hobo_model_controller
 
-  auto_actions :show, :edit, :update, :destroy
+  auto_actions :all, :except => [:index]
   auto_actions_for :project, [:new, :create]
 
-  autocomplete :new_member_name do
-    node = find_instance
-    hobo_completions :name, User.without_joined_node(node).is_not(node.owner)
+  def new
+    hobo_new do
+      if (params[:super_node]) then
+        sm = Node.find(params[:super_node])
+        @this.sources << sm
+        @this.project=sm.project
+      end
+      this.attributes = params[:node] || {}
+      hobo_ajax_response if request.xhr?
+    end
   end
-
 end

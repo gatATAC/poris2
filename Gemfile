@@ -59,4 +59,4 @@ gem 'jquery-ui-themes', '~> 0.0.4'
 gem 'hobo_clean_admin', '2.2.6'
 
 
-#gem 'acts_as_list'
+gem 'acts_as_list'

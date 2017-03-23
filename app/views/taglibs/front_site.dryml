@@ -13,3 +13,24 @@
 <include src="taglibs/auto/rapid/forms"/>
 
 <include src="application"/>
+
+<extend tag="show-page" for="Node">
+  <old-show-page>
+    <append-collection-section:>
+      <%= link_to "New Sub Node in #{@node.name}", :controller => :nodes, :action => :new, :super_node => @node, :only_path => :true %>
+    </append-collection-section:>
+  </old-show-page>
+</extend>
+
+    <extend tag="form" for="Node">
+      <old-form merge>
+      <field-list: fields="name, destinations, node_type, project, sources">
+              <destinations-view:>
+                  <select-many options="&this_parent.possible_destinations"/>
+              </destinations-view:>
+              <sources-view:>
+                  <select-many options="&this_parent.possible_sources"/>
+              </sources-view:>
+              </field-list:>
+      </old-form>
+    </extend>

@@ -5,25 +5,27 @@ class NodesEdge < ActiveRecord::Base
   fields do
     timestamps
   end
-  attr_accessible
 
-  belongs_to :source, :class_name => 'Node', :creator => true, :inverse_of => :edges_as_destination
-  belongs_to :destination, :class_name => 'Node', :inverse_of => :edges_as_source
+  attr_accessible :source, :source_id, :destination, :destination_id
 
-  #acts_as_list :scope => :source
+  belongs_to :source, :class_name => 'Node', :creator => :true, :inverse_of => :edges_as_source
+  belongs_to :destination, :class_name => 'Node', :inverse_of => :edges_as_destination
 
   # --- Permissions --- #
 
   def create_permitted?
-    acting_user.signed_up?
+    #acting_user.signed_up?
+        true
   end
 
   def update_permitted?
-    acting_user.signed_up?
+    #acting_user.signed_up?
+        true
   end
 
   def destroy_permitted?
-    acting_user.signed_up?
+    #acting_user.signed_up?
+        true
   end
 
   def view_permitted?(field)
