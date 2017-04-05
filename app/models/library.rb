@@ -5,7 +5,6 @@ class Library < Node
 
   attr_accessible :name, :node_type, :node_type_id, :project, :project_id, :super_libs, :sub_libs
 
-
   validates_presence_of my_mandatory_attributes
 
   # PARCHE: CREO QUE NO DEBERÍA EXISTIR ESTA LÍNEA
@@ -13,8 +12,17 @@ class Library < Node
   ##has_many :node_attributes, :foreign_key => :node_id
   belongs_to :project, :accessible => true, :creator => true
 
-  children :sub_libs#, :systems,:labels
+  children :sub_libs, :super_libs #:systems,:labels
   
+  def full_name
+    if super_libs.first then
+      ret = super_libs.first.full_name + "_" + self.name
+    else
+      ret = self.name
+    end
+    return ret
+  end
+
   def self.my_mandatory_attributes
     ret=super
   end

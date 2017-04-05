@@ -38,6 +38,9 @@
 
 <extend tag="show-page" for="Project">
   <old-show-page>
+    <collection: replace>
+        <sortable-collection:libraries param="collection"/>
+    </collection:>
     <append-collection-section:>
 <%= link_to "New Library in #{@project.name}", :controller => :libraries, :action => :new, :project => @project, :only_path => :true %>
     </append-collection-section:>
@@ -46,8 +49,31 @@
 
 <extend tag="show-page" for="Library">
   <old-show-page>
+    <heading: replace>
+      <h2 param="heading">
+        <ht key="library.show.heading" name="#{@library.full_name}">
+          Library2 <view:full-name/>
+        </ht>
+      </h2>
+      <p>Name: <name/></p>
+    </heading:>
+
+    <collection: replace>
+        <sortable-collection:sub_libs param="collection"/>
+    </collection:>
     <append-collection-section:>
       <%= link_to "New Sub Library in #{@library.name}", :controller => :libraries, :action => :new, :super_library => @library, :only_path => :true %>
     </append-collection-section:>
   </old-show-page>
 </extend>
+
+
+<extend tag="card" for="Library">
+  <old-card merge>
+    <header: replace>
+      <h4 param="header"><a><view:full-name/></a></h4>
+    </header:>
+  </old-card>
+</extend>
+
+

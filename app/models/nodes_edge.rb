@@ -11,6 +11,8 @@ class NodesEdge < ActiveRecord::Base
   belongs_to :source, :class_name => 'Node', :creator => :true, :inverse_of => :edges_as_source
   belongs_to :destination, :class_name => 'Node', :inverse_of => :edges_as_destination
 
+  acts_as_list :scope => :source
+  
   # --- Permissions --- #
 
   def create_permitted?

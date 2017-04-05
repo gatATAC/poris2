@@ -8,15 +8,17 @@ class Node < ActiveRecord::Base
     timestamps
   end
 
-  attr_accessible :name, :node_type, :node_type_id, :project, :project_id, :edges_as_source, :destinations, :edges_as_destination, :sources
+  attr_accessible :name, :node_type, :node_type_id, :project, :project_id, :edges_as_source, :destinations, :edges_as_destination, :sources, :position
 
-  belongs_to :project, :creator => true, :inverse_of => :nodes
+  belongs_to :project, :creator => true, :inverse_of => :nodes, :counter_cache => true
   belongs_to :node_type, :inverse_of => :nodes
 
-  has_many :edges_as_source, :class_name => 'NodesEdge', :foreign_key => 'source_id', :dependent => :destroy, :inverse_of => :source
-  has_many :destinations, :through => :edges_as_source, :class_name => 'Node', :accessible => :true
+  acts_as_list :scope => :project
+
+  has_many :edges_as_source, -> { order(position: :asc) }, :class_name => 'NodesEdge', :foreign_key => 'source_id', :dependent => :destroy, :inverse_of => :source
+  has_many :destinations, :through => :edges_as_source, :class_name => 'Node'
   has_many :edges_as_destination, :class_name => 'NodesEdge', :foreign_key => 'destination_id', :inverse_of => :destination, :dependent => :destroy
-  has_many :sources, :through => :edges_as_destination, :class_name => 'Node', :accessible => :true
+  has_many :sources, :through => :edges_as_destination, :class_name => 'Node'
 
   def self.my_mandatory_attributes
     [:name,:project_id,:node_type_id]
@@ -31,6 +33,10 @@ class Node < ActiveRecord::Base
   validate :destinations_valid?
 
   children :destinations, :sources
+
+  def title
+    "peep"
+  end
 
   def possible_destinations
     ret = []

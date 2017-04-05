@@ -4,5 +4,4 @@ class NodesEdgesController < ApplicationController
 
   auto_actions :all, :except => [:index, :new, :create]
   auto_actions_for :source, [:new, :create]
-
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170323212104) do
+ActiveRecord::Schema.define(version: 20170405184132) do
 
   create_table "node_types", force: :cascade do |t|
     t.string   "name"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20170323212104) do
     t.integer  "project_id"
     t.integer  "node_type_id"
     t.string   "type"
+    t.integer  "position"
   end
 
   add_index "nodes", ["node_type_id"], name: "index_nodes_on_node_type_id"

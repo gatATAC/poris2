@@ -11,7 +11,7 @@ class Project < ActiveRecord::Base
     public :boolean    
     timestamps
   end
-  attr_accessible :name, :abbrev, :hostnameport, :owner_id, :owner, :prefix, :description, :public
+  attr_accessible :name, :abbrev, :hostnameport, :owner_id, :owner, :prefix, :description, :public, :libraries, :nodes
 
   belongs_to :owner, :class_name => "User", :creator => true, :inverse_of => :projects
 
@@ -32,7 +32,7 @@ class Project < ActiveRecord::Base
   has_many :contributor_memberships, :class_name => "ProjectMembership", :scope => :contributor
   has_many :contributors, :through => :contributor_memberships, :source => :user
   
-  has_many :nodes, :dependent => :destroy, :inverse_of => :project
+  has_many :nodes, -> { order(position: :asc) }, :dependent => :destroy, :inverse_of => :project
   has_many :libraries, :dependent => :destroy, :inverse_of => :project
 
   children :libraries, :project_memberships
