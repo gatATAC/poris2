@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170314192015) do
+ActiveRecord::Schema.define(version: 20170323212104) do
 
   create_table "node_types", force: :cascade do |t|
     t.string   "name"
@@ -27,10 +27,12 @@ ActiveRecord::Schema.define(version: 20170314192015) do
     t.datetime "updated_at"
     t.integer  "project_id"
     t.integer  "node_type_id"
+    t.string   "type"
   end
 
   add_index "nodes", ["node_type_id"], name: "index_nodes_on_node_type_id"
   add_index "nodes", ["project_id"], name: "index_nodes_on_project_id"
+  add_index "nodes", ["type"], name: "index_nodes_on_type"
 
   create_table "nodes_edges", force: :cascade do |t|
     t.datetime "created_at"
@@ -38,7 +40,6 @@ ActiveRecord::Schema.define(version: 20170314192015) do
     t.integer  "source_id"
     t.integer  "destination_id"
     t.integer  "position"
-    t.string   "name"
   end
 
   add_index "nodes_edges", ["destination_id"], name: "index_nodes_edges_on_destination_id"

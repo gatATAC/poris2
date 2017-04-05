@@ -32,9 +32,10 @@ class Project < ActiveRecord::Base
   has_many :contributor_memberships, :class_name => "ProjectMembership", :scope => :contributor
   has_many :contributors, :through => :contributor_memberships, :source => :user
   
-  has_many :nodes, :dependent => :destroy, :inverse_of => :node_type
+  has_many :nodes, :dependent => :destroy, :inverse_of => :project
+  has_many :libraries, :dependent => :destroy, :inverse_of => :project
 
-  children :nodes, :project_memberships
+  children :libraries, :project_memberships
 
 
   # --- Permissions --- #

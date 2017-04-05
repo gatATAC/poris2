@@ -34,3 +34,20 @@
               </field-list:>
       </old-form>
     </extend>
+
+
+<extend tag="show-page" for="Project">
+  <old-show-page>
+    <append-collection-section:>
+<%= link_to "New Library in #{@project.name}", :controller => :libraries, :action => :new, :project => @project, :only_path => :true %>
+    </append-collection-section:>
+  </old-show-page>
+</extend>
+
+<extend tag="show-page" for="Library">
+  <old-show-page>
+    <append-collection-section:>
+      <%= link_to "New Sub Library in #{@library.name}", :controller => :libraries, :action => :new, :super_library => @library, :only_path => :true %>
+    </append-collection-section:>
+  </old-show-page>
+</extend>
