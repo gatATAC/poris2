@@ -11,7 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170409005555) do
+ActiveRecord::Schema.define(version: 20170409012154) do
+
+  create_table "labels", force: :cascade do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "scope_kind_id"
+    t.integer  "node_id"
+  end
+
+  add_index "labels", ["node_id"], name: "index_labels_on_node_id"
+  add_index "labels", ["scope_kind_id"], name: "index_labels_on_scope_kind_id"
 
   create_table "node_attributes", force: :cascade do |t|
     t.string   "name"
@@ -89,6 +100,14 @@ ActiveRecord::Schema.define(version: 20170409005555) do
     t.string   "name"
     t.string   "abbrev"
     t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "scope_kinds", force: :cascade do |t|
+    t.string   "name"
+    t.text     "description"
+    t.string   "src_format"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

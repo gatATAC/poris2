@@ -22,7 +22,7 @@ class Node < ActiveRecord::Base
   has_many :sources, :through => :edges_as_destination, :class_name => 'Node', :inverse_of => :destinations
 
   has_many :node_attributes, :dependent => :destroy, :inverse_of => :node
-  ##has_many :labels, :foreign_key => :node_id
+  has_many :labels, :dependent => :destroy, :inverse_of => :node
 
   def self.my_mandatory_attributes
     [:name,:project_id,:node_type_id]
