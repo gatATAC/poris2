@@ -29,9 +29,9 @@ class ProjectMembership < ActiveRecord::Base
 
   def name
     ret = ""
-    ret += self.user.abbrev
+    ret += self.user.to_s
     ret += " as "
-    ret += self.role.abbrev
+    ret += self.role.to_s
     ret += " in "
     ret += self.project.abbrev
   end

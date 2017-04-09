@@ -1,133 +1,34 @@
 Behaviour:
 
-When trying to show a project as administrator, no problem.
+After changing the ProjectMembership name calculation from using "abbrev" to use to_s ....
 
-When trying to show a project as another user with permission to view, it crashes.  And it crashes because it tryes to show two project_memberships.  The only one and another phantom one.
+  def name
+    ret = ""
+    ret += self.user.abbrev
+    ret += " as "
+    ret += self.role.abbrev
+    ret += " in "
+    ret += self.project.abbrev
+  end
 
-The crash log follows here.
+--->
 
-My investigantions (that will be demonstrated later) point to the "children" auto generator in the sidebar (cards), because if I exchange the the childrens and the project memberships are not shown in the sidebar (are overwritten in the collection-section) nothing crashes.  Libraries are then shown in the sidebar with no issues.
+  def name
+    ret = ""
+    ret += self.user.to_s
+    ret += " as "
+    ret += self.role.to_s
+    ret += " in "
+    ret += self.project.abbrev
+  end
 
-The project memberships try to show a name built on the abbreviations of the user, role and project relationships.  And hobo says that, for a valid ProjectMemberships, user and role are Nil, so it crashes trying to show the abbrev fields of Nil values.
+the web stops crashing, but in the aside column, when acting_user is not "admin" we see:
 
-If we simply exchange the ret = user.abbrev + " as " + role.abbrev sentence by ret = user.to_s + " as " + role.to_s, then no crash appears.  We see the real project membership (with names instead of abbreviations) but then it appears a second card, showing only the word "as".  This is (nothing) as (nothing) because it consider user and role as Nil.  Then, if we change the user to the administrator, the phantom card dissappears.
+Project memberships
+Txinto Vaz as Systems Engineer in test
+as in test
 
-Meanwhile, in the content body we are showing a tableplus collection, and this collection is (in all cases) showing just one ProjectMembership.  Same in the console and in the SQLite database.
+This is, it appears a second card, (nothing) as (nothing) in test
 
-So, it seems to create a phantom object when the user is not admin.
+If we change the user to administrator, this "phantom card" dissappears.
 
-To fix this, I can do two workarounds:
-* To exchange first and second children of project, so libraries are shown in the sidebar.
-* To override (not tested yet) the info in the sidebar by custom code, so I can simply delete the children sentence.
-* To filter to not try to concatenate Nil items.
-
-I think it is a bug, and I created this branch to try to help finding the problem.  I'll add the sqlite to help diagnosing.
-
-tx.
-
-
-
-
------------
-
-
-ActionView::Template::Error (undefined method `abbrev' for nil:NilClass):
-  app/models/project_membership.rb:32:in `name'
-  app/views/taglibs/auto/rapid/cards.dryml:67:in `block (8 levels) in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:67:in `block (7 levels) in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:67:in `block (6 levels) in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:67:in `block (5 levels) in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:67:in `block (4 levels) in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:66:in `block (3 levels) in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:65:in `block in card__for_project_membership'
-  app/views/taglibs/auto/rapid/cards.dryml:64:in `card__for_project_membership'
-  app/views/taglibs/auto/rapid/pages.dryml:733:in `block (6 levels) in show_page__for_project'
-  app/views/taglibs/auto/rapid/pages.dryml:727:in `block (5 levels) in show_page__for_project'
-  app/views/taglibs/auto/rapid/pages.dryml:727:in `block (4 levels) in show_page__for_project'
-  app/views/taglibs/auto/rapid/pages.dryml:726:in `block (3 levels) in show_page__for_project'
-  app/views/taglibs/auto/rapid/pages.dryml:683:in `block in show_page__for_project'
-  app/views/taglibs/auto/rapid/pages.dryml:682:in `show_page__for_project'
-  app/views/taglibs/front_site.dryml:40:in `block in show_page__for_project_with_a413385fed22'
-  app/views/taglibs/front_site.dryml:39:in `show_page__for_project_with_a413385fed22'
-  app/controllers/projects_controller.rb:27:in `show'
-
-
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/templates/rescues/_source.erb (22.5ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/templates/rescues/_trace.html.erb (7.8ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/templates/rescues/_request_and_response.html.erb (1.2ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/templates/rescues/template_error.html.erb within rescues/layout (45.7ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/_markup.html.erb (0.7ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/_inner_console_markup.html.erb within layouts/inlined_string (0.4ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/_prompt_box_markup.html.erb within layouts/inlined_string (0.3ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/style.css.erb within layouts/inlined_string (0.4ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/console.js.erb within layouts/javascript (36.4ms)
-  Rendered /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/index.html.erb (50.6ms)
-
-ActionView::Template::Error: undefined method `normalize_args' for #<WebConsole::View:0x007fe7e92bebd8>
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/hobo-2.2.6/lib/hobo/extensions/action_view/translation_helper.rb:12:in `translate'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/view.rb:34:in `t'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/console.js.erb:95:in `___sers_txinto__rvm_gems_ruby________gems_web_console_______lib_web_console_templates_console_js_erb__526830216540105386_70316991812820'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/template.rb:145:in `block in render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications.rb:166:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/template.rb:333:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/template.rb:143:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:54:in `block (2 levels) in render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/abstract_renderer.rb:39:in `block in instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications.rb:164:in `block in instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications/instrumenter.rb:20:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications.rb:164:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/abstract_renderer.rb:39:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:53:in `block in render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:61:in `render_with_layout'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:52:in `render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:14:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/renderer.rb:46:in `render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/renderer.rb:27:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/helpers/rendering_helper.rb:32:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/view.rb:17:in `render_javascript'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/templates/index.html.erb:3:in `___sers_txinto__rvm_gems_ruby________gems_web_console_______lib_web_console_templates_index_html_erb__2959981176450192512_70316988999380'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/template.rb:145:in `block in render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications.rb:166:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/template.rb:333:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/template.rb:143:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:54:in `block (2 levels) in render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/abstract_renderer.rb:39:in `block in instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications.rb:164:in `block in instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications/instrumenter.rb:20:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/notifications.rb:164:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/abstract_renderer.rb:39:in `instrument'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:53:in `block in render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:61:in `render_with_layout'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:52:in `render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/template_renderer.rb:14:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/renderer.rb:46:in `render_template'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/renderer/renderer.rb:27:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionview-4.2.8/lib/action_view/helpers/rendering_helper.rb:32:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/template.rb:20:in `render'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/middleware.rb:42:in `block in call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/middleware.rb:18:in `catch'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/web-console-2.3.0/lib/web_console/middleware.rb:18:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/show_exceptions.rb:30:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/railties-4.2.8/lib/rails/rack/logger.rb:38:in `call_app'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/railties-4.2.8/lib/rails/rack/logger.rb:20:in `block in call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/tagged_logging.rb:68:in `block in tagged'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/tagged_logging.rb:26:in `tagged'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/tagged_logging.rb:68:in `tagged'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/railties-4.2.8/lib/rails/rack/logger.rb:20:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/quiet_assets-1.1.0/lib/quiet_assets.rb:27:in `call_with_quiet_assets'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/request_id.rb:21:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/methodoverride.rb:22:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/runtime.rb:18:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/activesupport-4.2.8/lib/active_support/cache/strategy/local_cache_middleware.rb:28:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/lock.rb:17:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/actionpack-4.2.8/lib/action_dispatch/middleware/static.rb:120:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/sendfile.rb:113:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/railties-4.2.8/lib/rails/engine.rb:518:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/railties-4.2.8/lib/rails/application.rb:165:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/lock.rb:17:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/content_length.rb:15:in `call'
-	from /Users/txinto/.rvm/gems/ruby-2.1.10/gems/rack-1.6.5/lib/rack/handler/webrick.rb:88:in `service'
-	from /Users/txinto/.rvm/rubies/ruby-2.1.10/lib/ruby/2.1.0/webrick/httpserver.rb:138:in `service'
-	from /Users/txinto/.rvm/rubies/ruby-2.1.10/lib/ruby/2.1.0/webrick/httpserver.rb:94:in `run'
-	from /Users/txinto/.rvm/rubies/ruby-2.1.10/lib/ruby/2.1.0/webrick/server.rb:295:in `block in start_thread'
-    
