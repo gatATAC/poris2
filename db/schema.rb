@@ -11,7 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170405214109) do
+ActiveRecord::Schema.define(version: 20170409005555) do
+
+  create_table "node_attributes", force: :cascade do |t|
+    t.string   "name"
+    t.string   "content"
+    t.boolean  "visibility", default: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "node_id"
+  end
+
+  add_index "node_attributes", ["node_id"], name: "index_node_attributes_on_node_id"
 
   create_table "node_types", force: :cascade do |t|
     t.string   "name"
@@ -29,12 +40,9 @@ ActiveRecord::Schema.define(version: 20170405214109) do
     t.integer  "node_type_id"
     t.string   "type"
     t.integer  "position"
-    t.integer  "tree_order"
-    t.integer  "parent_id"
   end
 
   add_index "nodes", ["node_type_id"], name: "index_nodes_on_node_type_id"
-  add_index "nodes", ["parent_id"], name: "index_nodes_on_parent_id"
   add_index "nodes", ["project_id"], name: "index_nodes_on_project_id"
   add_index "nodes", ["type"], name: "index_nodes_on_type"
 

@@ -80,8 +80,11 @@
     </collection:>
     <append-collection-section:>
       <%= link_to "New Sub Library in #{@library.name}", :controller => :libraries, :action => :new, :super_library => @library, :only_path => :true %>
+      <h3 param="collection-heading">Attributes</h3>
+      <collection:node_attributes param/>
+      <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
     </append-collection-section:>
-  </old-show-page>
+</old-show-page>
 </extend>
 
 

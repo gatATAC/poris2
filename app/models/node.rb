@@ -7,7 +7,9 @@ class Node < ActiveRecord::Base
     timestamps
   end
 
-  attr_accessible :name, :node_type, :node_type_id, :project, :project_id, :edges_as_source, :destinations, :edges_as_destination, :sources, :position, :tree_order, :parent, :parent_id, :node_attributes
+  attr_accessible :name, :node_type, :node_type_id, :project, 
+  :project_id, :edges_as_source, :destinations, :edges_as_destination, 
+  :sources, :position, :tree_order, :parent, :parent_id, :node_attributes
 
   belongs_to :project, :creator => true, :inverse_of => :nodes, :counter_cache => true, :accessible => :true
   belongs_to :node_type, :inverse_of => :nodes
@@ -19,7 +21,7 @@ class Node < ActiveRecord::Base
   has_many :edges_as_destination, :class_name => 'NodesEdge', :foreign_key => 'destination_id', :inverse_of => :destination, :dependent => :destroy
   has_many :sources, :through => :edges_as_destination, :class_name => 'Node', :inverse_of => :destinations
 
-  #has_many :node_attributes, :dependent => :destroy, :inverse_of => :node
+  has_many :node_attributes, :dependent => :destroy, :inverse_of => :node
   ##has_many :labels, :foreign_key => :node_id
 
   def self.my_mandatory_attributes
