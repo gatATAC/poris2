@@ -35,7 +35,7 @@ class Project < ActiveRecord::Base
   has_many :nodes, -> { order(position: :asc) }, :dependent => :destroy, :inverse_of => :project
   has_many :libraries, :dependent => :destroy, :inverse_of => :project
 
-  children :project_memberships, :libraries
+  children :libraries, :project_memberships
 
   # --- Permissions --- #
 
