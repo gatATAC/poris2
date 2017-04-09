@@ -11,13 +11,13 @@ class ProjectMembership < ActiveRecord::Base
 
   attr_accessible :contributor, :maximum_layer, :user, :user_id, :role, :role_id
 
-  belongs_to :project, :inverse_of => :project_memberships
-  belongs_to :user, :inverse_of => :project_memberships
-  belongs_to :role, :inverse_of => :project_memberships
+  belongs_to :project, :inverse_of => :project_memberships, :accessible => :true
+  belongs_to :user, :inverse_of => :project_memberships, :accessible => :true
+  belongs_to :role, :inverse_of => :project_memberships, :accessible => :true
 
   # TODO: See if it is possible to ask for the fields
   def self.my_mandatory_attributes
-    [:project, :user, :maximum_layer, :role]
+    [:project, :user, :abbrev, :maximum_layer, :role]
   end
 
   def self.my_attributes
@@ -27,14 +27,14 @@ class ProjectMembership < ActiveRecord::Base
 
   validates_presence_of my_mandatory_attributes
 
-def name
-  ret = ""
-  ret += user.abbrev
-  ret += " as "
-  ret += role.abbrev
-  ret += " in "
-  ret += project.abbrev
-end
+  def name
+    ret = ""
+    ret += self.user.abbrev
+    ret += " as "
+    ret += self.role.abbrev
+    ret += " in "
+    ret += self.project.abbrev
+  end
 
   # --- Permissions --- #
 
@@ -52,5 +52,6 @@ end
 
   def view_permitted?(attribute)
     project.viewable_by?(acting_user)
+    true
   end
 end

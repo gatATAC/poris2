@@ -38,12 +38,29 @@
 
 <extend tag="show-page" for="Project">
   <old-show-page>
-    <collection: replace>
-        <sortable-collection:libraries param="collection"/>
-    </collection:>
-    <append-collection-section:>
-<%= link_to "New Library in #{@project.name}", :controller => :libraries, :action => :new, :project => @project, :only_path => :true %>
-    </append-collection-section:>
+    <collection-section: replace>
+      <h3>Root Libraries</h3>
+      <table-plus: with="&@libraries" fields="this,super_libs,sub_libs">
+        <search-filter: replace>
+          <libsearch-filter/>
+        </search-filter:>
+        <controls:/>
+        <empty-message:>No libraries match your criteria</empty-message:>
+      </table-plus:>
+      <%= link_to "New Library in #{@project.name}", :controller => :libraries, :action => :new, :project => @project, :only_path => :true %>
+
+      <h3>Members</h3>
+      <table-plus with="&@project_memberships" fields="this, user, role">
+        <prepend-header:>
+          <div class="filter">
+            Display by role: <filter-menu param-name="role" options="&[] + Role.all"/>
+          </div>
+        </prepend-header:>
+        <empty-message:>No stories match your criteria</empty-message:>
+      </table-plus>
+      <a:project_memberships action="new" if="&can_create?(@project.project_memberships)">New Membership</a>
+          
+    </collection-section:>
   </old-show-page>
 </extend>
 
@@ -76,4 +93,18 @@
   </old-card>
 </extend>
 
-
+<def tag='libsearch-filter'>
+  <form method='get' param='libsearch-form' action='' merge-attrs with='&nil'>
+    <hidden-fields param for-query-string skip='page, libsearch'/>
+    <span param='label'><t key='hobo.table_plus.libsearch'>LibSearch</t></span>
+    <input name='libsearch' class='libsearch' param type='libsearch' value='&params[:libsearch]'/>
+    <submit label='&t(&apos;hobo.table_plus.submit_label&apos;, :default=>&apos;Go&apos;)' class='libsearch-button' param='libsearch-submit'/>
+  </form>
+  <if test='&params[:libsearch]'>
+    <form method='get' param='libclear-form' action='' merge-attrs with='&nil'>
+      <hidden-fields for-query-string skip='page, libsearch'/>
+      <input name='libsearch' type='hidden' value=''/>
+      <submit label='&t(&apos;hobo.table_plus.libclear_label&apos;, :default=>&apos;LibClear&apos;)' class='libsearch-button' param='libclear-submit'/>
+    </form>
+  </if>
+</def>

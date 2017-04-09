@@ -12,26 +12,23 @@ class NodesEdge < ActiveRecord::Base
   belongs_to :destination, :class_name => 'Node', :inverse_of => :edges_as_destination
 
   acts_as_list :scope => :source
-  
+
   # --- Permissions --- #
 
   def create_permitted?
-    #acting_user.signed_up?
-        true
+    acting_user.signed_up? && source.project.accepts_changes_from?(acting_user)
   end
 
   def update_permitted?
-    #acting_user.signed_up?
-        true
+    acting_user.signed_up? && !source_changed? && source.project.accepts_changes_from?(acting_user)
   end
 
   def destroy_permitted?
-    #acting_user.signed_up?
-        true
+    acting_user.signed_up? && source.project.accepts_changes_from?(acting_user)
   end
 
-  def view_permitted?(field)
-    true
+  def view_permitted?(attribute)
+    source.viewable_by?(acting_user)
   end
 
 end

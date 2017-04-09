@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
     # on the user#edit form.
 
     name          :string, :required, :unique
-    abbrev :string, :unique
+    abbrev :string, :unique, :required
     email_address :email_address, :login => true
     administrator :boolean, :default => false
     timestamps
