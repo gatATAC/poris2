@@ -11,7 +11,7 @@ class Node < ActiveRecord::Base
   :project_id, :edges_as_source, :destinations, :edges_as_destination, 
   :sources, :position, :tree_order, :parent, :parent_id, :node_attributes
 
-  belongs_to :project, :creator => true, :inverse_of => :nodes, :counter_cache => true, :accessible => :true
+  belongs_to :project, :creator => true, :inverse_of => :nodes, :accessible => :true
   belongs_to :node_type, :inverse_of => :nodes
 
   acts_as_list :scope => :project
