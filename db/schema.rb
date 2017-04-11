@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170411060140) do
+ActiveRecord::Schema.define(version: 20170411061432) do
 
   create_table "labels", force: :cascade do |t|
     t.string   "name"
@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20170411060140) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "node_id"
+    t.integer  "position"
   end
 
   add_index "node_attributes", ["node_id"], name: "index_node_attributes_on_node_id"

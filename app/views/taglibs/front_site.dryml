@@ -14,6 +14,22 @@
 
 <include src="application"/>
 
+<def tag='libsearch-filter'>
+  <form method='get' param='libsearch-form' action='' merge-attrs with='&nil'>
+    <hidden-fields param for-query-string skip='page, libsearch'/>
+    <span param='label'><t key='hobo.table_plus.libsearch'>LibSearch</t></span>
+    <input name='libsearch' class='libsearch' param type='libsearch' value='&params[:libsearch]'/>
+    <submit label='&t(&apos;hobo.table_plus.submit_label&apos;, :default=>&apos;Go&apos;)' class='libsearch-button' param='libsearch-submit'/>
+  </form>
+  <if test='&params[:libsearch]'>
+    <form method='get' param='libclear-form' action='' merge-attrs with='&nil'>
+      <hidden-fields for-query-string skip='page, libsearch'/>
+      <input name='libsearch' type='hidden' value=''/>
+      <submit label='&t(&apos;hobo.table_plus.libclear_label&apos;, :default=>&apos;LibClear&apos;)' class='libsearch-button' param='libclear-submit'/>
+    </form>
+  </if>
+</def>
+
 <extend tag="show-page" for="Node">
   <old-show-page>
     <append-collection-section:>
@@ -22,18 +38,18 @@
   </old-show-page>
 </extend>
 
-    <extend tag="form" for="Node">
-      <old-form merge>
-      <field-list: fields="name, destinations, node_type, project, sources">
-              <destinations-view:>
-                  <select-many options="&this_parent.possible_destinations"/>
-              </destinations-view:>
-              <sources-view:>
-                  <select-many options="&this_parent.possible_sources"/>
-              </sources-view:>
-              </field-list:>
-      </old-form>
-    </extend>
+<extend tag="form" for="Node">
+  <old-form merge>
+  <field-list: fields="name, destinations, node_type, project, sources">
+          <destinations-view:>
+              <select-many options="&this_parent.possible_destinations"/>
+          </destinations-view:>
+          <sources-view:>
+              <select-many options="&this_parent.possible_sources"/>
+          </sources-view:>
+          </field-list:>
+  </old-form>
+</extend>
 
 
 <extend tag="show-page" for="Project">
@@ -69,7 +85,7 @@
     <heading: replace>
       <h2 param="heading">
         <ht key="library.show.heading" name="#{@library.full_name}">
-          Library2 <view:full-name/>
+          Library <view:full-name/>
         </ht>
       </h2>
       <p>Name: <name/></p>
@@ -82,7 +98,7 @@
       <%= link_to "New Sub Library in #{@library.name}", :controller => :libraries, :action => :new, :super_library => @library, :only_path => :true %>
 
       <h3 param="collection-heading">Attributes</h3>
-      <collection:node_attributes param/>
+      <sortable-collection:node_attributes param/>
       <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
 
       <h3 param="collection-heading">Labels</h3>
@@ -106,18 +122,31 @@
   </old-card>
 </extend>
 
-<def tag='libsearch-filter'>
-  <form method='get' param='libsearch-form' action='' merge-attrs with='&nil'>
-    <hidden-fields param for-query-string skip='page, libsearch'/>
-    <span param='label'><t key='hobo.table_plus.libsearch'>LibSearch</t></span>
-    <input name='libsearch' class='libsearch' param type='libsearch' value='&params[:libsearch]'/>
-    <submit label='&t(&apos;hobo.table_plus.submit_label&apos;, :default=>&apos;Go&apos;)' class='libsearch-button' param='libsearch-submit'/>
-  </form>
-  <if test='&params[:libsearch]'>
-    <form method='get' param='libclear-form' action='' merge-attrs with='&nil'>
-      <hidden-fields for-query-string skip='page, libsearch'/>
-      <input name='libsearch' type='hidden' value=''/>
-      <submit label='&t(&apos;hobo.table_plus.libclear_label&apos;, :default=>&apos;LibClear&apos;)' class='libsearch-button' param='libclear-submit'/>
-    </form>
-  </if>
-</def>
+<extend tag="show-page" for="System">
+  <old-show-page>
+    <heading: replace>
+      <h2 param="heading">
+        <ht key="system.show.heading" name="#{@system.full_name}">
+          System <view:full-name/>
+        </ht>
+      </h2>
+      <p>Name: <name/></p>
+    </heading:>
+
+    <collection: replace>
+        <sortable-collection:sub_systems param="collection"/>
+    </collection:>
+    <append-collection-section:>
+      <%= link_to "New Sub System in #{@system.name}", :controller => :systems, :action => :new, :super_system => @system, :only_path => :true %>
+
+      <h3 param="collection-heading">Attributes</h3>
+      <sortable-collection:node_attributes param/>
+      <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
+
+      <h3 param="collection-heading">Labels</h3>
+      <collection:labels param/>
+      <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
+
+    </append-collection-section:>
+</old-show-page>
+</extend>

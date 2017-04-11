@@ -12,6 +12,8 @@ class NodeAttribute < ActiveRecord::Base
 
   belongs_to :node, :creator => true, :inverse_of => :node_attributes
 
+  acts_as_list :scope => :node
+
   validates_presence_of :node, :name, :content
 
   # --- Permissions --- #
