@@ -89,6 +89,10 @@
       <collection:labels param/>
       <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
 
+      <h3 param="collection-heading">Systems</h3>
+      <collection:systems param/>
+      <%= link_to "New System in #{@library.name}", :controller => :systems, :action => :new, :library => @library, :only_path => :true %>
+
     </append-collection-section:>
 </old-show-page>
 </extend>

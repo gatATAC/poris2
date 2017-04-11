@@ -16,7 +16,8 @@ class NodesEdge < ActiveRecord::Base
   # --- Permissions --- #
 
   def create_permitted?
-    acting_user.signed_up? && source.project.accepts_changes_from?(acting_user)
+    acting_user.signed_up? && ((source == nil && destination.project.accepts_changes_from?(acting_user)) ||
+      (source.project.accepts_changes_from?(acting_user)))
   end
 
   def update_permitted?
@@ -24,7 +25,8 @@ class NodesEdge < ActiveRecord::Base
   end
 
   def destroy_permitted?
-    acting_user.signed_up? && source.project.accepts_changes_from?(acting_user)
+    acting_user.signed_up? && ((source == nil && destination.project.accepts_changes_from?(acting_user)) ||
+      (source.project.accepts_changes_from?(acting_user)))
   end
 
   def view_permitted?(attribute)

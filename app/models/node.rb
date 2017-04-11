@@ -59,6 +59,11 @@ class Node < ActiveRecord::Base
         errors.add(:destinations, "can't contain a node not suitable for present node. f.i. not of the same project.")
     end
   end
+
+  def default_node_type
+    NodeType.find_by_name(self.class.name)
+  end
+
   # --- Permissions --- #
 
   def create_permitted?
