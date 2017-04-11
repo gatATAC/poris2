@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170409012154) do
+ActiveRecord::Schema.define(version: 20170411060140) do
 
   create_table "labels", force: :cascade do |t|
     t.string   "name"
@@ -92,6 +92,7 @@ ActiveRecord::Schema.define(version: 20170409012154) do
     t.string   "prefix"
     t.text     "description"
     t.boolean  "public"
+    t.integer  "nodes_count",  default: 0, null: false
   end
 
   add_index "projects", ["owner_id"], name: "index_projects_on_owner_id"

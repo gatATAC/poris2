@@ -9,6 +9,7 @@ class Project < ActiveRecord::Base
     prefix :string
     description :text
     public :boolean    
+    nodes_count :integer, :default => 0, :null => false
     timestamps
   end
   attr_accessible :name, :abbrev, :hostnameport, :owner_id, :owner, :prefix, :description, :public, :libraries, :nodes
