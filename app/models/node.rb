@@ -12,7 +12,7 @@ class Node < ActiveRecord::Base
   :sources, :position, :tree_order, :parent, :parent_id, :node_attributes
 
   belongs_to :project, :creator => true, :inverse_of => :nodes, :counter_cache => true, :accessible => :true
-  belongs_to :node_type, :inverse_of => :nodes
+  belongs_to :node_type, :inverse_of => :nodes, :accessible => :true
 
   acts_as_list :scope => :project
 
@@ -64,6 +64,32 @@ class Node < ActiveRecord::Base
     NodeType.find_by_name(self.class.name)
   end
 
+  def ancestor_relation
+    return sources
+  end
+
+  def descendant_relation
+    return destinations
+  end
+  
+  def ancestors
+    ret = []
+    super_libs.each { |e|
+      ret += [e]
+      ret += e.ancestors
+    }
+    return ret
+  end
+
+  def descendants
+    ret = []
+    sub_libs.each { |e|
+      ret += [e]
+      ret += e.descendants
+    }
+    return ret
+  end
+
   # --- Permissions --- #
 
   def create_permitted?
@@ -71,7 +97,8 @@ class Node < ActiveRecord::Base
   end
 
   def update_permitted?
-    acting_user.signed_up? && project.accepts_changes_from?(acting_user) && !node_type_changed?
+    acting_user.signed_up? && project.accepts_changes_from?(acting_user) 
+    # && !node_type_changed?
   end
 
   def destroy_permitted?

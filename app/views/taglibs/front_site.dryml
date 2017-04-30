@@ -38,9 +38,21 @@
   </old-show-page>
 </extend>
 
+<extend tag="show-page" for="NodeAttribute">
+  <old-show-page>
+    <field-list: skip="position"/>
+  </old-show-page>
+</extend>
+
+<extend tag="form" for="NodeAttribute">
+  <old-form merge>
+    <field-list: skip="position"/>
+  </old-form>
+</extend>
+
 <extend tag="form" for="Node">
   <old-form merge>
-  <field-list: fields="name, destinations, node_type, project, sources">
+  <field-list: tag="editor" fields="name, destinations, node_type, project, sources">
           <destinations-view:>
               <select-many options="&this_parent.possible_destinations"/>
           </destinations-view:>
@@ -88,31 +100,55 @@
           Library <view:full-name/>
         </ht>
       </h2>
-      <p>Name: <name/></p>
+      <p>Name: <name/>, Project: <view:project/></p>
     </heading:>
+    <field-list: skip="position"/>
 
-    <collection: replace>
+    <content-body: replace>
+    <tabs>
+      <properties:>
+        <field-list fields="node_type" param/>
+        <h3 param="collection-heading">Attributes</h3>
+        <sortable-collection:node_attributes param/>
+        <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
+
+        <h3 param="collection-heading">Labels</h3>
+        <collection:labels param/>
+        <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
+      </properties:>
+      <descendants:>
+        <h3 param="collection-heading">Sub Libraries</h3>
         <sortable-collection:sub_libs param="collection"/>
-    </collection:>
-    <append-collection-section:>
-      <%= link_to "New Sub Library in #{@library.name}", :controller => :libraries, :action => :new, :super_library => @library, :only_path => :true %>
+        <%= link_to "New Sub Library in #{@library.name}", :controller => :libraries, :action => :new, :super_library => @library, :only_path => :true %>
 
-      <h3 param="collection-heading">Attributes</h3>
-      <sortable-collection:node_attributes param/>
-      <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
-
-      <h3 param="collection-heading">Labels</h3>
-      <collection:labels param/>
-      <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
-
-      <h3 param="collection-heading">Systems</h3>
-      <collection:systems param/>
-      <%= link_to "New System in #{@library.name}", :controller => :systems, :action => :new, :library => @library, :only_path => :true %>
-
-    </append-collection-section:>
+        <h3 param="collection-heading">Systems inside this library</h3>
+        <sortable-collection:systems param/>
+        <%= link_to "New System in #{@library.name}", :controller => :systems, :action => :new, :library => @library, :only_path => :true %>
+      </descendants:>
+      <ancestors:>
+        <h3 param="collection-heading">Super Libraries</h3>
+        <sortable-collection:super_libs param="collection"/>
+      </ancestors:>
+      <tree:>
+        <h3 param="collection-heading">Tree</h3>
+      </tree:>
+    </tabs>
+    </content-body:>
 </old-show-page>
 </extend>
 
+<extend tag="form" for="Library">
+  <old-form merge>
+    <field-list: skip="position">
+      <sub-libs-view:>
+        <select-many options="&this_parent.possible_sub_libs"/>
+      </sub-libs-view:>
+      <super-libs-view:>
+        <select-many options="&this_parent.possible_super_libs"/>
+      </super-libs-view:>
+    </field-list:>
+  </old-form>
+</extend>
 
 <extend tag="card" for="Library">
   <old-card merge>
@@ -132,7 +168,7 @@
       </h2>
       <p>Name: <name/></p>
     </heading:>
-
+    <field-list: skip="position"/>
     <collection: replace>
         <sortable-collection:sub_systems param="collection"/>
     </collection:>
@@ -147,6 +183,66 @@
       <collection:labels param/>
       <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
 
+      <h3 param="collection-heading">Flows</h3>
+      <sortable-collection:flows param/>
+      <%= link_to "New Flow in #{@system.name}", :controller => :flows, :action => :new, :system => @system, :only_path => :true %>
+
     </append-collection-section:>
 </old-show-page>
+</extend>
+<extend tag="form" for="System">
+  <old-form merge>
+    <field-list: skip="position"/>
+  </old-form>
+</extend>
+
+<extend tag="show-page" for="Flow">
+  <old-show-page>
+    <heading: replace>
+      <h2 param="heading">
+        <ht key="flow.show.heading" name="#{@flow.full_name}">
+          System <view:full-name/>
+        </ht>
+      </h2>
+      <p>Name: <name/></p>
+    </heading:>
+    <field-list: skip="position"/>
+    <collection: replace>
+        <sortable-collection:sub_flows param="collection"/>
+    </collection:>
+    <append-collection-section:>
+      <%= link_to "New Sub Flow in #{@flow.name}", :controller => :flows, :action => :new, :super_flow => @flow, :only_path => :true %>
+
+      <h3 param="collection-heading">Attributes</h3>
+      <sortable-collection:node_attributes param/>
+      <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
+
+      <h3 param="collection-heading">Labels</h3>
+      <collection:labels param/>
+      <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
+
+      <h3 param="collection-heading">Values</h3>
+      <sortable-collection:values param/>
+      <%= link_to "New Value in #{@flow.name}", :controller => :values, :action => :new, :flow => @flow, :only_path => :true %>
+
+    </append-collection-section:>
+</old-show-page>
+</extend>
+
+<extend tag="form" for="Flow">
+  <old-form merge>
+    <field-list: skip="position"/>
+  </old-form>
+</extend>
+
+<extend tag="show-page" for="Value">
+  <old-show-page merge>
+    <field-list: skip="position"/>
+  </old-show-page>
+</extend>
+
+<extend tag="form" for="Value">
+  <old-form merge>
+    <field-list: skip="position"/>
+  </old-form>
 </extend>

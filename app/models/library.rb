@@ -7,7 +7,7 @@ class Library < Node
 
   validates_presence_of my_mandatory_attributes
 
-  children :sub_libs, :super_libs, :systems,:labels
+  #children :sub_libs, :super_libs, :systems,:labels
   
   def full_name
     if super_libs.first then
@@ -25,6 +25,24 @@ class Library < Node
   def self.my_attributes
     ret=super
     ret+=[:default_mode_id]
+  end
+
+  def ancestor_relation
+    return super_libs
+  end
+
+  def descendant_relation
+    return sub_libs
+  end
+
+  def possible_sub_libs
+    ret = []
+    ret +=  self.project.libraries - [self] - self.ancestors
+  end
+
+  def possible_super_libs
+    ret = []
+    ret += self.project.nodes - [self] - self.descendants
   end
 
 end

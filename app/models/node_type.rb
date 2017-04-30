@@ -22,7 +22,7 @@ class NodeType < ActiveRecord::Base
 
   validates_presence_of my_mandatory_attributes
 
-  has_many :nodes, :inverse_of => :node_type
+  has_many :nodes, :inverse_of => :node_type, :accessible => :true
 
   # --- Permissions --- #
 
