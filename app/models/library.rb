@@ -10,8 +10,9 @@ class Library < Node
   #children :sub_libs, :super_libs, :systems,:labels
   
   def full_name
-    if super_libs.first then
-      ret = super_libs.first.full_name + "_" + self.name
+    sl = super_libs.first
+    if sl then
+      ret = sl.full_name + "_" + self.name
     else
       ret = self.name
     end
@@ -42,7 +43,7 @@ class Library < Node
 
   def possible_super_libs
     ret = []
-    ret += self.project.nodes - [self] - self.descendants
+    ret += self.project.libraries - [self] - self.descendants
   end
 
 end

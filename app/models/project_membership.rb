@@ -17,7 +17,7 @@ class ProjectMembership < ActiveRecord::Base
 
   # TODO: See if it is possible to ask for the fields
   def self.my_mandatory_attributes
-    [:project, :user, :abbrev, :maximum_layer, :role]
+    [:project, :user, :maximum_layer, :role]
   end
 
   def self.my_attributes

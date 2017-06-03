@@ -74,7 +74,7 @@ class Node < ActiveRecord::Base
   
   def ancestors
     ret = []
-    super_libs.each { |e|
+    sources.each { |e|
       ret += [e]
       ret += e.ancestors
     }
@@ -83,7 +83,7 @@ class Node < ActiveRecord::Base
 
   def descendants
     ret = []
-    sub_libs.each { |e|
+    sources.each { |e|
       ret += [e]
       ret += e.descendants
     }

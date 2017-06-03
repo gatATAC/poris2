@@ -187,12 +187,46 @@
       <sortable-collection:flows param/>
       <%= link_to "New Flow in #{@system.name}", :controller => :flows, :action => :new, :system => @system, :only_path => :true %>
 
+      <h3 param="collection-heading">Modes</h3>
+      <sortable-collection:modes param/>
+      <%= link_to "New Mode in #{@system.name}", :controller => :modes, :action => :new, :system => @system, :only_path => :true %>
+
     </append-collection-section:>
 </old-show-page>
 </extend>
+
 <extend tag="form" for="System">
   <old-form merge>
-    <field-list: skip="position"/>
+    <field-list: skip="position">
+      <sub-systems-view:>
+        <select-many options="&this_parent.possible_sub_systems"/>
+      </sub-systems-view:>
+      <super-systems-view:>
+        <select-many options="&this_parent.possible_super_systems"/>
+      </super-systems-view:>
+      <libraries-view:>
+        <select-many options="&this_parent.possible_libraries"/>
+      </libraries-view:>
+      <flows-view:>
+        <select-many options="&this_parent.possible_flows"/>
+      </flows-view:>
+    </field-list:>    
+  </old-form>
+</extend>
+
+<extend tag="form" for="Mode">
+  <old-form merge>
+    <field-list: skip="position">
+      <sub-modes-view:>
+        <select-many options="&this_parent.possible_sub_modes"/>
+      </sub-modes-view:>
+      <super-modes-view:>
+        <select-many options="&this_parent.possible_super_modes"/>
+      </super-modes-view:>
+      <systems-view:>
+        <select-many options="&this_parent.possible_systems"/>
+      </systems-view:>
+    </field-list:>    
   </old-form>
 </extend>
 
@@ -225,13 +259,60 @@
       <sortable-collection:values param/>
       <%= link_to "New Value in #{@flow.name}", :controller => :values, :action => :new, :flow => @flow, :only_path => :true %>
 
+      <h3 param="collection-heading">Modes</h3>
+      <sortable-collection:modes param/>
+      <%= link_to "New Mode in #{@flow.name}", :controller => :modes, :action => :new, :system => @flow, :only_path => :true %>
+
     </append-collection-section:>
 </old-show-page>
 </extend>
 
+<extend tag="show-page" for="Mode">
+  <old-show-page>
+    <heading: replace>
+      <h2 param="heading">
+        <ht key="mode.show.heading" name="#{@mode.full_name}">
+          System <view:full-name/>
+        </ht>
+      </h2>
+      <p>Name: <name/></p>
+    </heading:>
+    <field-list: skip="position"/>
+    <collection: replace>
+        <sortable-collection:sub_modes param="collection"/>
+    </collection:>
+    <append-collection-section:>
+      <%= link_to "New Sub Mode in #{@mode.name}", :controller => :modes, :action => :new, :super_mode => @mode, :only_path => :true %>
+
+      <h3 param="collection-heading">Attributes</h3>
+      <sortable-collection:node_attributes param/>
+      <a:node_attributes action="new" if="&can_create?(@this.node_attributes)"  param="new-link">New Attribute for <%=  @this.name %></a>
+
+      <h3 param="collection-heading">Labels</h3>
+      <collection:labels param/>
+      <a:labels action="new" if="&can_create?(@this.labels)"  param="new-link">New Label for <%=  @this.name %></a>
+
+    </append-collection-section:>
+</old-show-page>
+</extend>
+
+
 <extend tag="form" for="Flow">
   <old-form merge>
-    <field-list: skip="position"/>
+    <field-list: skip="position,flows,libraries,sub_systems,super_systems">
+      <sub-flows-view:>
+        <select-many options="&this_parent.possible_sub_flows"/>
+      </sub-flows-view:>
+      <super-flows-view:>
+        <select-many options="&this_parent.possible_super_flows"/>
+      </super-flows-view:>
+      <systems-view:>
+        <select-many options="&this_parent.possible_systems"/>
+      </systems-view:>
+      <values-view:>
+        <select-many options="&this_parent.possible_values"/>
+      </values-view:>
+    </field-list:>  
   </old-form>
 </extend>
 
@@ -245,4 +326,31 @@
   <old-form merge>
     <field-list: skip="position"/>
   </old-form>
+</extend>
+
+<extend tag="card" for="System">
+<old-card merge>
+<append-body:>
+<div class="values">
+  Values: <repeat:values join=", "><a><%= this.name%></a></repeat><else>None</else>
+</div>
+<div class="flows">
+  Flows: <repeat:flows join=", "><a><%= this.name%></a></repeat><else>None</else>
+</div>
+<div class="modes">
+  Modes: <repeat:modes join=", "><a><%= this.name%></a></repeat><else>None</else>
+</div>
+</append-body:>
+</old-card>
+</extend>
+
+
+<extend tag="card" for="Mode">
+<old-card merge>
+<append-body:>
+<div class="systems">
+  Systems: <repeat:systems join=", "><a><%= this.name%></a></repeat><else>None</else>
+</div>
+</append-body:>
+</old-card>
 </extend>

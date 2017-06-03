@@ -1,4 +1,4 @@
-class Flow < Node
+class Flow < System
 
   has_many :sub_flows, :through => :edges_as_source, :accessible => true, :source => :destination, 
   :class_name => 'Flow', :inverse_of => :super_flows
@@ -17,8 +17,9 @@ class Flow < Node
   children :sub_flows, :super_flows, :systems,:labels, :node_attributes, :values
   
   def full_name
-    if super_flows.first then
-      ret = super_flows.first.full_name + "_" + self.name
+    sf = self.super_flows.first
+    if sf then
+      ret = sf.full_name + "_" + self.name
     else
       ret = self.name
     end
@@ -33,5 +34,28 @@ class Flow < Node
     ret=super
     ret+=[:default_mode_id]
   end
+
+
+  def possible_sub_flows
+    ret = []
+    ret +=  self.project.flows - [self] - self.ancestors
+  end
+
+  def possible_super_flows
+    ret = []
+    ret += self.project.flows - [self] - self.descendants
+  end
+
+
+  def possible_systems
+    ret = []
+    ret += self.project.systems - self.systems
+  end
+
+  def possible_values
+    ret = []
+    ret += self.project.values - self.values
+  end
+
 
 end
